@@ -22,6 +22,7 @@ const excuses = [
     },
 ];
 
+app.use(express.json());
 
 app.get('/hello', (req, res) => {
     res.status(200).json({ message: 'Hello world!' }); //expressi funktsioonid, vastuseks on json
@@ -32,13 +33,50 @@ app.get('/excuses', (req, res) => {
 });
 
 app.get('/excuses/:id', (req, res) => {
+    const key = req.query.key;
     const id = req.params.id;
-    const excuse = excuses[id -1];
+    const excuse = excuses[id - 1];
     res.status(200).json({
         excuse: excuse
     });
 });
 
+app.post('/excuses', (req, res) => {
+    const description = req.body.description;
+    if (description) {
+        const excuse = {
+            id: excuses.length + 1,
+            description: description
+        };
+        excuses.push(excuse);
+        res.status(201).json({
+            id: excuse.id
+        });
+    } else {
+        res.status(400).json({
+            error: 'Description is missing'
+        });
+    }
+});
+
+//elemendi kustutamine massiivist
+app.delete('excuses/:id', (req, res) => {
+    const id = req.params.id;
+    excuses.splice(id - 1, 1);
+    res.status(200).end(); //kui ei taha vastust saada muud kui et ok, siis "end".
+});
+
+//PATCH muudab mingit osalist asja, ühte ressurssi kasutaja kirjetest ntx.
+//PUT kirjutab üle kogu kasutaja info
+app.patch('/excuses/:id', (req, res) => {
+    const id = req.params.id;
+    const description = req.body.description;
+    excuses[id - 1].description = description;
+    res.status(200).json({
+        success: true
+    });
+});
+
 app.listen(port, () => {
     console.log('Server is running on port:', port);
-})
+});

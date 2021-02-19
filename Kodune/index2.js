@@ -5,20 +5,20 @@ const port = 3300;
 
 const students = [
     {
-        id: 1,
-        description: "RIF1"
+        id: "RIF1",
+        description: "Rakendusinformaatika 1. kursus"
     },
     {
-        id: 2,
-        description: "KTD1"
+        id: "KTD1",
+        description: "Käsitöötehnoloogiad ja disain 1. kursus"
     },
     {
-        id: 3,
-        description: "LO1"
+        id: "LO1",
+        description: "Liiklusohutus 1. kursus"
     },
     {
-        id: 4,
-        description: "Tervisejuht1"
+        id: "Tervisejuht1",
+        description: "Tervisejuht1Tervisejuht 1. kursus"
     },
 ];
 
@@ -67,8 +67,22 @@ app.get('/tere', (req, res) => { //esimene, testimiseks.
     res.status(200).json({ message: 'Tere!' });
 });
 
+app.get('/', (req, res) => { //kõik koos
+    res.status(200).json();
+});
+
+//Students CRUD
 app.get('/students', (req, res) => {
     res.status(200).json({ students: students });
+});
+
+app.get('/students/:id', (req, res) => {
+    const key = req.query.key;
+    const id = req.params.id;
+    const student = students[id - 1];
+    res.status(200).json({
+        student: student
+    });
 });
 
 app.post('/students', (req, res) => {
@@ -87,6 +101,97 @@ app.post('/students', (req, res) => {
             error: 'Description is missing'
         });
     }
+});
+
+app.patch('/students/:id', (req, res) => {
+    const id = req.params.id;
+    const description = req.body.description;
+    students[id - 1].description = description;
+    res.status(200).json({
+        success: true
+    });
+});
+
+app.delete('students/:id', (req, res) => {
+    const id = req.params.id;
+    students.splice(id - 1, 1);
+    res.status(200).end();
+});
+
+//Teachers
+app.get('/teachers', (req, res) => {
+    res.status(200).json({ teachers: teachers });
+});
+
+app.post('/teachers', (req, res) => {
+    const description = req.body.description;
+    if (description) {
+        const teacher = {
+            id: teachers.length + 1,
+            description: description
+        };
+        teachers.push(teacher);
+        res.status(201).json({
+            id: teacher.id
+        });
+    } else {
+        res.status(400).json({
+            error: 'Description is missing'
+        });
+    }
+});
+
+app.patch('/teachers/:id', (req, res) => {
+    const id = req.params.id;
+    const description = req.body.description;
+    teachers[id - 1].description = description;
+    res.status(200).json({
+        success: true
+    });
+});
+
+app.delete('teachers/:id', (req, res) => {
+    const id = req.params.id;
+    teachers.splice(id - 1, 1);
+    res.status(200).end();
+});
+
+//Lectures
+app.get('/lectures', (req, res) => {
+    res.status(200).json({ lectures: lectures });
+});
+
+app.post('/lectures', (req, res) => {
+    const description = req.body.description;
+    if (description) {
+        const lecture = {
+            id: lectures.length + 1,
+            description: description
+        };
+        lectures.push(lecture);
+        res.status(201).json({
+            id: lecture.id
+        });
+    } else {
+        res.status(400).json({
+            error: 'Description is missing'
+        });
+    }
+});
+
+app.patch('/lectures/:id', (req, res) => {
+    const id = req.params.id;
+    const description = req.body.description;
+    lectures[id - 1].description = description;
+    res.status(200).json({
+        success: true
+    });
+});
+
+app.delete('lectures/:id', (req, res) => {
+    const id = req.params.id;
+    lectures.splice(id - 1, 1);
+    res.status(200).end();
 });
 
 app.listen(port, () => {

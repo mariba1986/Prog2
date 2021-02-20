@@ -112,7 +112,7 @@ app.patch('/students/:id', (req, res) => {
     });
 });
 
-app.delete('students/:id', (req, res) => {
+app.delete('/students/:id', (req, res) => {
     const id = req.params.id;
     students.splice(id - 1, 1);
     res.status(200).end();
@@ -150,7 +150,7 @@ app.patch('/teachers/:id', (req, res) => {
     });
 });
 
-app.delete('teachers/:id', (req, res) => {
+app.delete('/teachers/:id', (req, res) => {
     const id = req.params.id;
     teachers.splice(id - 1, 1);
     res.status(200).end();
@@ -188,7 +188,7 @@ app.patch('/lectures/:id', (req, res) => {
     });
 });
 
-app.delete('lectures/:id', (req, res) => {
+app.delete('/lectures/:id', (req, res) => {
     const id = req.params.id;
     lectures.splice(id - 1, 1);
     res.status(200).end();

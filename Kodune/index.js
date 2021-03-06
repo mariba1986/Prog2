@@ -9,6 +9,7 @@ const {
     studentsRoutes,
     teachersRoutes,
 } = require('./api/routes');
+
 const { port } = config || 3300;
 const { logger } = require('./api/middlewares');
 const app = express();
@@ -22,9 +23,9 @@ app.use(logger);
 
 
 // Routes
-app.use = ('/teachers', teachersRoutes);
-app.use = ('/lectures', lecturesRoutes);
-app.use = ('/students', studentsRoutes);
+app.use('/teachers', teachersRoutes);
+app.use('/lectures', lecturesRoutes);
+app.use('/students', studentsRoutes);
 
 
 

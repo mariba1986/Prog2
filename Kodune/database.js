@@ -56,7 +56,32 @@ const database = {
             name: "Liina Viiret",
         },
     ],
-
+    users: [
+        {
+            id: 1,
+            firstName: 'Juku',
+            lastName: 'Juurikas',
+            email: 'juku@juurikas.ee',
+            password: 'juku',
+            role: 'User',
+        },
+        {
+            id: 2,
+            firstName: 'Mati',
+            lastName: 'Maasikas',
+            email: 'mati@maasikas.ee',
+            password: 'mati',
+            role: 'Admin',
+        },
+        {
+            id: 3,
+            firstName: "Maris",
+            lastName: "Riba",
+            email: "mariba@tlu.ee",
+            password: "$2b$10$iN3i4suHJXsnKQTKoeHlIuPE/nvIHv.4Vb66FoK3lvgzCXrcs.Pr2",
+            role: "Admin"
+        }
+    ],
 };
 
 module.exports = database;

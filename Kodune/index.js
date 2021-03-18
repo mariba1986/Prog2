@@ -8,6 +8,7 @@ const {
     lecturesRoutes,
     studentsRoutes,
     teachersRoutes,
+    usersRoutes,
 } = require('./api/routes');
 
 const { port } = config || 3300;
@@ -26,6 +27,7 @@ app.use(logger);
 app.use('/teachers', teachersRoutes);
 app.use('/lectures', lecturesRoutes);
 app.use('/students', studentsRoutes);
+app.use('/users', usersRoutes);
 
 
 

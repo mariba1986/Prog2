@@ -9,8 +9,8 @@ const { validators } = require('../middlewares');
  */
 router
   .get('/', studentsController.getStudents)
-  .get('/:id', validators.getStudentById, studentsController.getStudentById)
-  .post('/', validators.createStudent, studentsController.createStudent)
+  .get('/:id', studentsController.getStudentById)
+  .post('/', studentsController.createStudent)
   .patch('/:id', studentsController.updateStudent)
   .delete('/:id', studentsController.deleteStudent);
 

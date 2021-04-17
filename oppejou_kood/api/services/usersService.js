@@ -1,4 +1,3 @@
-//const database = require('../../database');
 const jwtService = require('./jwtService');
 const hashService = require('./hashService');
 const db = require('../../db');
@@ -38,7 +37,7 @@ usersService.createUser = async (newUser) => {
 
 // Deletes user
 usersService.deleteUser = async (id) => {
-  const result = await db.query('UPDATE users SET deleted = 1 WHERE id = ?', [id]);
+  await db.query('UPDATE users SET deleted = 1 WHERE id = ?', [id]);
   return true;
 };
 
@@ -58,14 +57,13 @@ usersService.updateUser = async (user) => {
     const hash = await hashService.hash(user.password);
     userToUpdate.password = hash;
   }
-  const result = await db.query('UPDATE users SET ? WHERE id = ?', [userToUpdate, user.id]);
-  console.log(result);
+  await db.query('UPDATE users SET ? WHERE id = ?', [userToUpdate, user.id]);
   return true;
 };
 
 // Find user by email. Returns user if found or undefined
 usersService.getUserByEmail = async (email) => {
-  const user = await db.query('SELECT * FROM users WHERE email = ? AND deleted = 0', [email]);
+  const user = await db.query('SELECT id, email, password, role FROM users WHERE email = ? AND deleted = 0', [email]);
   return user[0];
 };
 

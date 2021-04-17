@@ -16,9 +16,9 @@ const logger = (req, res, next) => {
 // Comments routes
 app.use = (commentsRoutes);
 // Middleware for creating req.body in express app
-app.use(express.json());
+//app.use(express.json());
 //Logger, salvestab timestampi millal mida päriti
-app.use(logger);
+//app.use(logger);
 
 
 /**

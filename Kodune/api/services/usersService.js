@@ -46,7 +46,7 @@ usersService.deleteUser = async (id) => {
 };
 
 
-// Updates user
+// Updates user - moodustakse userToUpdate objekt mis sisaldab neid key'sid mis selle user objektiga kaasa tulevad
 usersService.updateUser = async (user) => {
   const userToUpdate = {};
   if (user.firstName) {
@@ -76,6 +76,7 @@ usersService.getUserByEmail = async (email) => {
 // User login
 usersService.login = async (login) => {
   const { email, password } = login;
+  //console.log (user);
   const user = await usersService.getUserByEmail(email);
   if (!user) return { error: 'No user found' };
   const match = await hashService.compare(password, user.password);

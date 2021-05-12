@@ -1,5 +1,10 @@
 const database = require('../../database');
-const lecturesService = {};
+const db = require('../../db');
+
+const lecturesService = {
+
+
+};
 
 lecturesService.getLectures = () => {
     const { lectures } = database;

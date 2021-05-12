@@ -15,7 +15,7 @@ const database = {
         },
         {
             id: "Tervisejuht1",
-            description: "Tervisejuht1Tervisejuht 1. kursus",
+            description: "Tervisejuht 1. kursus",
         },
     ],
 

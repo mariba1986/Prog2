@@ -24,18 +24,17 @@ usersController.getUsers = (req, res) => {
  * Success: status 200 - OK and user with specified id
  * Error: status 400 - Bad Request and error message
  */
-usersController.getUserById = (req, res) => {
+usersController.getUserById = async (req, res) => {
   const id = parseInt(req.params.id, 10);
-  const user = usersService.getUserById(id);
-  if (user) {
-    res.status(200).json({
-      user,
-    });
-  } else {
-    res.status(400).json({
+  const user = await usersService.getUserById(id);
+  if (!user) {
+    return res.status(400).json({
       error: `No user found with id: ${id}`,
     });
   }
+  return res.status(200).json({
+    user,
+  });
 };
 
 /**
@@ -50,26 +49,27 @@ usersController.createUser = async (req, res) => {
   const {
     firstName, lastName, email, password,
   } = req.body;
-  if (firstName && lastName && email && password) {
-    const user = {
-      firstName,
-      lastName,
-      email,
-      password,
-    };
-    const id = await usersService.createUser(user);
-    if (id) {
-      res.status(201).json({
-        id,
-      });
-    } else {
-      res.status(500).json({
-        error: 'Something went wrong while creating user.',
-      });
-    }
+  if (!firstName || !lastName || !email || !password) {
+    return res.status(400).json({
+      error: 'Required data is missing.',
+    });
   }
+  const user = {
+    firstName,
+    lastName,
+    email,
+    password,
+  };
+  const data = await usersService.createUser(user);
+  if (data.error) {
+    return res.status(409).json({
+      error: data.error,
+    });
+  }
+  return res.status(201).json({
+    id: data.id,
+  });
 };
-
 /**
  * User login
  * POST - /users
@@ -82,27 +82,24 @@ usersController.login = async (req, res) => {
   const {
     email, password,
   } = req.body;
-  if (email && password) {
-    const login = {
-      email,
-      password,
-    };
-    const token = await usersService.login(login);
-    if (token) {
-      res.status(200).json({
-        token,
-      });
-    } else {
-      res.status(403).json({
-        error: 'Wrong e-mail or password.',
-      });
-    }
-  } else {
-    res.status(400).json({
+  if (!email && !password) {
+    return res.status(400).json({
       error: 'Email or password missing',
     });
   }
-
+  const login = {
+    email,
+    password,
+  };
+  const data = await usersService.login(login);
+  if (data.error) {
+    return res.status(403).json({
+      error: data.error,
+    });
+  }
+  return res.status(200).json({
+    token: data.token,
+  });
 };
 
 /**
@@ -113,24 +110,22 @@ usersController.login = async (req, res) => {
  * Success: status 204 - No Content
  * Error: status 400 - Bad Request and error message
  */
-usersController.deleteUser = (req, res) => {
+usersController.deleteUser = async (req, res) => {
   const id = parseInt(req.params.id, 10);
   // Check if user exists
-  const user = usersService.getUserById(id);
-  if (user) {
-    const success = usersService.deleteUser(id);
-    if (success) {
-      res.status(204).end();
-    } else {
-      res.status(500).json({
-        error: 'Something went wrong while deleting user',
-      });
-    }
-  } else {
-    res.status(400).json({
+  const user = await usersService.getUserById(id);
+  if (!user) {
+    return res.status(400).json({
       error: `No user found with id: ${id}`,
     });
   }
+  const success = await usersService.deleteUser(id);
+  if (!success) {
+    return res.status(500).json({
+      error: 'Something went wrong while deleting user',
+    });
+  }
+  return res.status(204).end();
 };
 
 /**
@@ -141,37 +136,41 @@ usersController.deleteUser = (req, res) => {
  * Success: status 200 - OK and success message
  * Error: status 400 - Bad Request and error message
  */
-usersController.updateUser = (req, res) => {
+usersController.updateUser = async (req, res) => {
   const id = parseInt(req.params.id, 10);
-  const { firstName, lastName } = req.body;
-  if (id && (firstName || lastName)) {
-    const user = usersService.getUserById(id);
-    if (user) {
-      const userToUpdate = {
-        id,
-        firstName,
-        lastName,
-      };
-      const success = usersService.updateUser(userToUpdate);
-      if (success) {
-        res.status(200).json({
-          success: true,
-        });
-      } else {
-        res.status(500).json({
-          error: 'Something went wrong while updating user',
-        });
-      }
-    } else {
-      res.status(400).json({
-        error: `No user found with id: ${id}`,
-      });
-    }
-  } else {
+  const {
+    firstName,
+    lastName,
+    email,
+    password,
+  } = req.body;
+  if (!id && !(firstName || lastName || email || password)) {
     res.status(400).json({
       error: 'Id, firstName or lastName is missing',
     });
   }
+  const user = await usersService.getUserById(id);
+  if (!user) {
+    res.status(400).json({
+      error: `No user found with id: ${id}`,
+    });
+  }
+  const userToUpdate = {
+    id,
+    firstName,
+    lastName,
+    email,
+    password,
+  };
+  const success = await usersService.updateUser(userToUpdate);
+  if (!success) {
+    return res.status(500).json({
+      error: 'Something went wrong while updating user',
+    });
+  }
+  return res.status(200).json({
+    success: true,
+  });
 };
 
 module.exports = usersController;

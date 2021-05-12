@@ -6,7 +6,7 @@ const util = require('util');
 const { db } = require('./config');
 
 
-const connection = mysql.createConnection({
+const pool = mysql.createPool({
   host: db.host,
   user: db.user,
   password: db.password,
@@ -17,11 +17,11 @@ const connection = mysql.createConnection({
 });
 
 //kui andmebaasi ei eksisteeri, siis loome selle: 
-connection.query(`CREATE SCHEMA IF NOT EXISTS ${db.database}`, () => {
-  connection.query(`USE ${db.database}`, () => { });
+pool.query(`CREATE SCHEMA IF NOT EXISTS ${db.database}`, () => {
+  pool.query(`USE ${db.database}`, () => { });
 });
 
 //muudame callback funktsiooni Promise'ks - see on selleks et saaks kasutada async awaite.
-connection.query = util.promisify(connection.query);
+pool.query = util.promisify(pool.query);
 //ekspordime ühenduse
-module.exports = connection;
+module.exports = pool;

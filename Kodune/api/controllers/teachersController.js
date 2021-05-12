@@ -4,16 +4,16 @@ const teachersController = {};
 
 
 
-teachersController.getTeachers = (req, res) => {
-    const teachers = teachersService.getTeachers();
+teachersController.getTeachers = async (req, res) => {
+    const teachers = await teachersService.getTeachers();
     res.status(200).json({
         teachers,
     });
 };
 
-teachersController.getTeacherById = (req, res) => {
+teachersController.getTeacherById = async (req, res) => {
     const id = parseInt(req.params.id, 10);
-    const teacher = teachersService.getTeacherById(id);
+    const teacher = await teachersService.getTeacherById(id);
     if (teacher) {
         res.status(200).json({
             teacher,
@@ -25,13 +25,13 @@ teachersController.getTeacherById = (req, res) => {
     }
 };
 
-teachersController.createTeacher = (req, res) => {
+teachersController.createTeacher = async (req, res) => {
     const { name } = req.body;
     if (name) {
         const teacher = {
             name,
         };
-        const id = teachersService.createTeacher(teacher);
+        const id = await teachersService.createTeacher(teacher);
         res.status(201).json({
             id,
         });
@@ -42,11 +42,11 @@ teachersController.createTeacher = (req, res) => {
     }
 };
 
-teachersController.deleteTeacher = (req, res) => {
+teachersController.deleteTeacher = async (req, res) => {
     const id = parseInt(req.params.id, 10);
-    const teacher = teachersService.getTeacherById(id);
+    const teacher = await teachersService.getTeacherById(id);
     if (teacher) {
-        const success = teachersService.deleteTeacher(id);
+        const success = await teachersService.deleteTeacher(id);
         if (success) {
             res.status(204).end();
         } else {
@@ -61,17 +61,17 @@ teachersController.deleteTeacher = (req, res) => {
     }
 };
 
-teachersController.updateTeacher = (req, res) => {
+teachersController.updateTeacher = async (req, res) => {
     const id = parseInt(req.params.id, 10);
     const { name } = req.body;
     if (id && name) {
-        const teacher = teachersService.getTeacherById(id);
+        const teacher = await teachersService.getTeacherById(id);
         if (teacher) {
             const teacherToUpdate = {
                 id,
                 name,
             };
-            const success = teachersService.updateTeacher(teacherToUpdate);
+            const success = await teachersService.updateTeacher(teacherToUpdate);
             if (success) {
                 res.status(200).json({
                     success: true,

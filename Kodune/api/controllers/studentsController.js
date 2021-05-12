@@ -9,8 +9,8 @@ const studentsController = {};
  * Optional values: none
  * Success: status 200 - OK and list of students
  */
-studentsController.getStudents = (req, res) => {
-  const students = studentsService.getStudents();
+studentsController.getStudents = async (req, res) => {
+  const students = await studentsService.getStudents();
   res.status(200).json({
     students,
   });
@@ -24,9 +24,9 @@ studentsController.getStudents = (req, res) => {
  * Success: status 200 - OK and student with specified id
  * Error: status 400 - Bad Request and error message
  */
-studentsController.getStudentById = (req, res) => {
+studentsController.getStudentById = async(req, res) => {
   const id = parseInt(req.params.id, 10);
-  const student = studentsService.getStudentById(id);
+  const student = await studentsService.getStudentById(id);
   if (student) {
     res.status(200).json({
       student,
@@ -46,14 +46,14 @@ studentsController.getStudentById = (req, res) => {
  * Success: status 201 - Created and id of created student
  * Error: status 400 - Bad Request and error message
  */
-studentsController.createStudent = (req, res) => {
+studentsController.createStudent = async (req, res) => {
   const { firstName, lastName } = req;
   if (firstName && lastName) {
     const student = {
       firstName,
       lastName,
     };
-    const id = studentsService.createStudent(student);
+    const id =await studentsService.createStudent(student);
     if (id) {
       res.status(201).json({
         id,
@@ -74,12 +74,12 @@ studentsController.createStudent = (req, res) => {
  * Success: status 204 - No Content
  * Error: status 400 - Bad Request and error message
  */
-studentsController.deleteStudent = (req, res) => {
+studentsController.deleteStudent = async (req, res) => {
   const id = parseInt(req.params.id, 10);
   // Check if student exists
-  const student = studentsService.getStudentById(id);
+  const student = await studentsService.getStudentById(id);
   if (student) {
-    const success = studentsService.deleteStudent(id);
+    const success = await studentsService.deleteStudent(id);
     if (success) {
       res.status(204).end();
     } else {
@@ -102,7 +102,7 @@ studentsController.deleteStudent = (req, res) => {
  * Success: status 200 - OK and success message
  * Error: status 400 - Bad Request and error message
  */
-studentsController.updateStudent = (req, res) => {
+studentsController.updateStudent = async (req, res) => {
   const id = parseInt(req.params.id, 10);
   const { firstName, lastName } = req.body;
   if (id && (firstName || lastName)) {
@@ -113,7 +113,7 @@ studentsController.updateStudent = (req, res) => {
         firstName,
         lastName,
       };
-      const success = studentsService.updateStudent(studentToUpdate);
+      const success = await studentsService.updateStudent(studentToUpdate);
       if (success) {
         res.status(200).json({
           success: true,

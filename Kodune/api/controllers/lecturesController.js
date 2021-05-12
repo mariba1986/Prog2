@@ -3,16 +3,16 @@
 const { lecturesService } = require('../services/');
 const lecturesController = {};
 
-lecturesController.getLectures = (req, res) => {
-    const lectures = lecturesService.getLectures();
+lecturesController.getLectures = async (req, res) => {
+    const lectures = await lecturesService.getLectures();
     res.status(200).json({
         lectures,
     });
 };
 
-lecturesController.getLectureById = (req, res) => {
+lecturesController.getLectureById = async (req, res) => {
     const id = parseInt(req.params.id, 10);
-    const lecture = lecturesService.getLectureById(id);
+    const lecture = await lecturesService.getLectureById(id);
     if (lecture) {
         res.status(200).json({
             lecture,
@@ -25,13 +25,13 @@ lecturesController.getLectureById = (req, res) => {
 };
 
 
-lecturesController.createLecture = (req, res) => {
+lecturesController.createLecture = async (req, res) => {
     const { description } = req.body;
     if (description) {
         const lecture = {
             description,
         };
-        const id = lecturesService.createLecture(lecture);
+        const id = await lecturesService.createLecture(lecture);
         if (id) {
             res.status(201).json({
                 id,
@@ -48,7 +48,7 @@ lecturesController.createLecture = (req, res) => {
     }
 };
 
-lecturesController.updateLecture = (req, res) => {
+lecturesController.updateLecture = async (req, res) => {
     const id = parseInt(req.params.id, 10);
     const { description } = req.body;
     if (id && description) {
@@ -58,7 +58,7 @@ lecturesController.updateLecture = (req, res) => {
                 id,
                 description,
             };
-            const success = lecturesService.updateLecture(lectureToUpdate);
+            const success = await lecturesService.updateLecture(lectureToUpdate);
             if (success) {
                 res.status(200).json({
                     success: true,
@@ -81,11 +81,11 @@ lecturesController.updateLecture = (req, res) => {
 };
 
 
-lecturesController.deleteLecture = (req, res) => {
+lecturesController.deleteLecture = async (req, res) => {
     const id = parseInt(req.params.id, 10);
     const lecture = lecturesService.getLectureById(id);
     if (lecture) {
-        const success = lecturesService.deleteLecture(id);
+        const success = await lecturesService.deleteLecture(id);
         if (success) {
             res.status(204).end();
         }

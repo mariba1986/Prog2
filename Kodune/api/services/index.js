@@ -11,5 +11,5 @@ module.exports = {
     teachersService,
     usersService,
     jwtService,
-    
+    hashService
 };

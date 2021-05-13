@@ -1,9 +1,13 @@
-const database = require('../../database');
+const jwtService = require('./jwtService');
+const hashService = require('./hashService');
+const db = require('../../db');
 
 const teachersService = {};
 
-teachersService.getTeachers = () => {
-    const { teachers } = database;
+//tagastab õppejõud - id ja nimi.
+
+teachersService.getTeachers = async () => {
+    const teachers = await db.query('SELECT id, name FROM teachers where deleted = 0');
     return teachers;
 };
 

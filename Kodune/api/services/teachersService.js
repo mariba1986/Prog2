@@ -35,17 +35,16 @@ teachersService.createTeacher = async (newTeacher) => {
     return { id: result.insertId };
 };
 
-teachersService.deleteTeacher = (id) => {
-    const index = database.teachers.findIndex((element) => element.id === id);
-    database.teachers.splice(index, 1);
+//õppejõu kustutamine
+teachersService.deleteTeacher = async (id) => {
+    await db.query('DELETE FROM teachers WHERE id = ?', [id]);
+    //console.log(result);
     return true;
 };
 
-teachersService.updateTeacher = (teacher) => {
-    const index = database.teachers.findIndex((element) => element.id === teacher.id);
-    if (teacher.name) {
-        database.teachers[index].name = teacher.name;
-    }
+//õppejõu muutmine
+teachersService.updateTeacher = async (teacher) => {
+    await db.query('UPDATE teachers SET name = ? WHERE id = ?', [teacher.name, teacher.id]);
     return true;
 };
 

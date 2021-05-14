@@ -1,4 +1,4 @@
-const database = require('../../database');
+
 const db = require('../../db');
 
 const lecturesService = {
@@ -6,42 +6,41 @@ const lecturesService = {
 
 };
 
-lecturesService.getLectures = () => {
-    const { lectures } = database;
+lecturesService.getLectures = async () => {
+    const lectures = await db.query('SELECT id, description FROM lectures where deleted = 0');
     return lectures;
 };
 
-lecturesService.getLectureById = (id) => {
-    const lecture = database.lectures.find((element) => element.id === id);
-    if (lecture) {
-        return lecture;
-    }
-    return false;
+lecturesService.getLectureById = async (id) => {
+    const lecture = await db.query('SELECT id, description FROM lectures WHERE id = ? AND deleted = 0', [id]);
+    if (!lecture[0]) return false;
+    return lecture[0];
 };
 
-lecturesService.createLecture = (newLecture) => {
-    const id = database.lectures.length + 1;
+lecturesService.createLecture = async (newLecture) => {
+    const existingLecture = await lecturesService.getLectureById(newLecture.id);
+    if (existingLecture) {
+        return { error: 'This lecture already exists' };
+    }
     const lecture = {
-        id,
-        ...newLecture,
+        id: newLecture.id,
+        description: newLecture.description,
     };
-    database.lectures.push(lecture);
-    return id;
+    const result = await db.query('INSERT INTO lectures SET ?', [lecture]);
+    return { id: result.insertId };
 };
 
-lecturesService.updateLecture = (lecture) => {
-    const index = database.lectures.findIndex((element) => element.id === lecture.id);
-    if (lecture.description) {
-        database.lectures[index].description = lecture.description;
-    }
+
+lecturesService.updateLecture = async (lecture) => {
+    await db.query('UPDATE lectures SET description = ? WHERE id = ?', [lecture.description, lecture.id]);
     return true;
 };
 
-lecturesService.deleteLecture = (id) => {
-    const index = database.lectures.findIndex((element) => element.id === id);
-    database.lectures.splice(index, 1);
+lecturesService.deleteLecture = async (id) => {
+    await db.query('DELETE FROM lectures WHERE id = ?', [id]);
     return true;
 };
+
 
 
 

@@ -24,7 +24,7 @@ studentsController.getStudents = async (req, res) => {
  * Success: status 200 - OK and student with specified id
  * Error: status 400 - Bad Request and error message
  */
-studentsController.getStudentById = async(req, res) => {
+studentsController.getStudentById = async (req, res) => {
   const id = parseInt(req.params.id, 10);
   const student = await studentsService.getStudentById(id);
   if (student) {
@@ -47,23 +47,27 @@ studentsController.getStudentById = async(req, res) => {
  * Error: status 400 - Bad Request and error message
  */
 studentsController.createStudent = async (req, res) => {
-  const { firstName, lastName } = req;
-  if (firstName && lastName) {
-    const student = {
-      firstName,
-      lastName,
-    };
-    const id =await studentsService.createStudent(student);
-    if (id) {
-      res.status(201).json({
-        id,
-      });
-    } else {
-      res.status(500).json({
-        error: 'Something went wrong while creating student.',
-      });
-    }
+  const { name, description } = req.body;
+  const createdById = req.userId;
+  if (!name || !description) {
+    return res.status(400).json({
+      error: 'Name or descritpion is missing',
+    });
   }
+  const student = {
+    name,
+    description,
+    createdById,
+  };
+  const id = await studentsService.createStudent(student);
+  if (!id) {
+    return res.status(500).json({
+      error: 'Something went wrong while creating student',
+    });
+  }
+  return res.status(201).json({
+    id: student.id,
+  });
 };
 
 /**
@@ -74,26 +78,30 @@ studentsController.createStudent = async (req, res) => {
  * Success: status 204 - No Content
  * Error: status 400 - Bad Request and error message
  */
+
 studentsController.deleteStudent = async (req, res) => {
   const id = parseInt(req.params.id, 10);
-  // Check if student exists
+  const createdById = req.userId;
+  const isAdmin = req.userRole === 'Admin';
   const student = await studentsService.getStudentById(id);
-  if (student) {
-    const success = await studentsService.deleteStudent(id);
-    if (success) {
-      res.status(204).end();
-    } else {
-      res.status(500).json({
-        error: 'Something went wrong while deleting student',
-      });
-    }
-  } else {
-    res.status(400).json({
+  if (!student) {
+    return res.status(400).json({
       error: `No student found with id: ${id}`,
     });
   }
+  if (!(student.createdById === createdById || isAdmin)) {
+    return res.status(403).json({
+      error: 'You have no rights to delete this student',
+    });
+  }
+  const success = await studentsService.deleteStudent(id);
+  if (!success) {
+    return res.status(500).json({
+      error: 'Something went wrong while deleting student',
+    });
+  }
+  return res.status(204).end();
 };
-
 /**
  * Update student
  * PATCH - /students/:id
@@ -104,35 +112,40 @@ studentsController.deleteStudent = async (req, res) => {
  */
 studentsController.updateStudent = async (req, res) => {
   const id = parseInt(req.params.id, 10);
-  const { firstName, lastName } = req.body;
-  if (id && (firstName || lastName)) {
-    const student = studentsService.getStudentById(id);
-    if (student) {
-      const studentToUpdate = {
-        id,
-        firstName,
-        lastName,
-      };
-      const success = await studentsService.updateStudent(studentToUpdate);
-      if (success) {
-        res.status(200).json({
-          success: true,
-        });
-      } else {
-        res.status(500).json({
-          error: 'Something went wrong while updating student',
-        });
-      }
-    } else {
-      res.status(400).json({
-        error: `No student found with id: ${id}`,
-      });
-    }
-  } else {
+  const { description, name } = req.body;
+  const createdById = req.userId;
+  const isAdmin = req.userRole === 'Admin';
+  // Check if student exists
+  const student = await studentsService.getStudentById(id);
+  if (!student) {
     res.status(400).json({
-      error: 'Id, firstName or lastName is missing',
+      error: `No student found with id: ${id}`,
     });
   }
+  if (!(student.createdById === createdById || isAdmin)) {
+    return res.status(403).json({
+      error: 'You have no rights to update this student',
+    });
+  }
+  if (!(description || name)) {
+    return res.status(400).json({
+      error: 'No required data provided',
+    });
+  }
+  const studentToUpdate = {
+    id,
+    description,
+    name,
+  };
+  const success = await studentsService.updateStudent(studentToUpdate);
+  if (!success) {
+    return res.status(500).json({
+      error: 'Something went wrong while updating student',
+    });
+  }
+  return res.status(200).json({
+    success,
+  });
 };
 
 module.exports = studentsController;

@@ -1,48 +1,53 @@
-const database = require('../../database');
+const db = require('../../db');
+
 
 const studentsService = {};
 
 // Returns list of students
-studentsService.getStudents = () => {
-    const { students } = database;
+studentsService.getStudents = async () => {
+    const students = await db.query('SELECT id,name, description FROM students where deleted = 0');
     return students;
 };
 
 // Find student by id. Returns student if found or false.
-studentsService.getStudentById = (id) => {
-    const student = database.students.find((element) => element.id === id);
-    if (student) {
-        return student;
-    }
-    return false;
+studentsService.getStudentById = async (id) => {
+    const student = await db.query('SELECT id,name, description FROM students WHERE id = ? AND deleted = 0', [id]);
+    if (!student[0]) return false;
+    return student[0];
 };
 
+
 // Creates new student, returns id on new student
-studentsService.createStudent = (newStudent) => {
-    const id = database.students.length + 1;
+studentsService.createStudent = async (newStudent) => {
+    const existingStudent = await studentsService.getStudentById(newStudent.id);
+    if (existingStudent) {
+        return { error: 'This student already exists' };
+    }
     const student = {
-        id,
-        ...newStudent,
+        id: newStudent.id,
+        name: newStudent.name,
+        description: newStudent.description,
     };
-    database.students.push(student);
-    return id;
+    const result = await db.query('INSERT INTO students SET ?', [student]);
+    return { id: result.insertId };
 };
 
 // Deletes student
-studentsService.deleteStudent = (id) => {
-    // Find student index
-    const index = database.students.findIndex((element) => element.id === id);
-    // Remove student from 'database'
-    database.students.splice(index, 1);
+studentsService.deleteStudent = async (id) => {
+    await db.query('UPDATE students SET deleted = 1 WHERE id = ?', [id]);
     return true;
 };
 
 // Updates student
-studentsService.updateStudent = (student) => {
-    const index = database.students.findIndex((element) => element.id === student.id);
+studentsService.updateStudent = async (student) => {
+    const studentToUpdate = {};
     if (student.description) {
-        database.students[index].description = student.description;
+        studentToUpdate.description = student.description;
     }
+    if (student.name) {
+        studentToUpdate.name = student.name;
+    }
+    await db.query('UPDATE students SET ? WHERE id = ?', [studentToUpdate, student.id]);
     return true;
 };
 

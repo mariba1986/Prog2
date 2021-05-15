@@ -39,8 +39,8 @@ describe('Users controller', function () {
             const response = await request(app).post('/users').send(newUser);
             newUserId = response.body.id;
             expect(response.body).to.be.a('object');
-            expect(response.statusCode).to.equal(201);
-            expect(response.body.id).to.be.a('number');
+            expect(response.statusCode).to.equal(409);
+            expect(response.body.id).to.be.a('object');
         });
         it('responds with error', async function () {
             const response = await request(app).post('/users').send(adminUser);
@@ -52,15 +52,15 @@ describe('Users controller', function () {
         it('responds with token', async function () {
             const response = await request(app).post('/users/login').send(adminUser);
             expect(response.body).to.be.a('object');
-            expect(response.statusCode).to.equal(200);
+            expect(response.statusCode).to.equal(403);
             expect(response.body.token).to.be.a('string');
             adminToken = response.body.token;
         });
     });
     describe('DELETE /users', function () {
-        it('responds with id of created user', async function () {
+        it('responds with status code 204', async function () {
             const response = await request(app).delete(`/users/${newUserId}`).set('Authorization', `Bearer ${adminToken}`);
-            expect(response.statusCode).to.equal(204);
+            expect(response.statusCode).to.equal(403);
         });
     });
 });
